@@ -17,7 +17,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var _binding: ActivityMainBinding
     private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
+    private lateinit var runnableBackZero: Runnable
+    private lateinit var runnablePlus: Runnable
+    private lateinit var runnableMinus: Runnable
     private val handlerThread: HandlerThread = HandlerThread("MyThread")
     var number: Int = 0
     var rowY: Float = 0f
@@ -31,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         handlerThread.start()
         handler = Handler(handlerThread.looper)
         _binding.layoutTouchEvent.setOnTouchListener { _, event ->
-            handler.removeCallbacks(runnable)
+            handler.removeCallbacks(runnableBackZero)
             if (event.action == MotionEvent.ACTION_MOVE) {
                 var y = event.y
                 when {
@@ -41,29 +43,44 @@ class MainActivity : AppCompatActivity() {
                 _binding.tvNumberShow.text = number.toString()
             }
             rowY = event.y
-            handler.postDelayed(runnable, 2000)
+            handler.postDelayed(runnableBackZero, 2000)
 
             true
         }
 
         _binding.btnPlus.setOnClickListener {
-            number += 1
+            handler.removeCallbacks(runnableBackZero)
+            number++
             _binding.tvNumberShow.text = number.toString()
+            handler.postDelayed(runnableBackZero, 2000)
         }
 
         _binding.btnMinus.setOnClickListener {
-            number -= 1
+            handler.removeCallbacks(runnableBackZero)
+            number--
             _binding.tvNumberShow.text = number.toString()
+            handler.postDelayed(runnableBackZero, 2000)
         }
 
-        runnable = Runnable {
+        _binding.btnPlus.setOnLongClickListener {
+            handler.post(runnablePlus)
+            true
+        }
+
+        _binding.btnMinus.setOnLongClickListener {
+            handler.post(runnableMinus)
+            true
+        }
+
+
+        runnableBackZero = Runnable {
             when {
                 number > 0 -> {
                     number--
                     this.runOnUiThread {
                         _binding.tvNumberShow.text = number.toString()
                     }
-                    handler.postDelayed(runnable, 50)
+                    handler.postDelayed(runnableBackZero, 50)
                 }
 
                 number < 0 -> {
@@ -71,11 +88,38 @@ class MainActivity : AppCompatActivity() {
                     this.runOnUiThread {
                         _binding.tvNumberShow.text = number.toString()
                     }
-                    handler.postDelayed(runnable, 50)
+                    handler.postDelayed(runnableBackZero, 50)
                 }
                 else -> {
-                    handler.removeCallbacks(runnable)
+                    handler.removeCallbacks(runnableBackZero)
                 }
+            }
+        }
+        runnablePlus = Runnable {
+            handler.removeCallbacks(runnableBackZero)
+            number++
+            if (_binding.btnPlus.isPressed) {
+                handler.postDelayed(runnablePlus, 50)
+                this.runOnUiThread {
+                    _binding.tvNumberShow.text = number.toString()
+                }
+            } else {
+                handler.removeCallbacks(runnablePlus)
+                handler.postDelayed(runnableBackZero, 2000)
+            }
+        }
+
+        runnableMinus = Runnable {
+            handler.removeCallbacks(runnableBackZero)
+            number--
+            if (_binding.btnMinus.isPressed) {
+                handler.postDelayed(runnableMinus, 50)
+                this.runOnUiThread {
+                    _binding.tvNumberShow.text = number.toString()
+                }
+            } else {
+                handler.removeCallbacks(runnableMinus)
+                handler.postDelayed(runnableBackZero, 2000)
             }
         }
     }
