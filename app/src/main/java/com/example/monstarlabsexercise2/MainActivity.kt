@@ -1,6 +1,7 @@
 package com.example.monstarlabsexercise2
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -9,9 +10,12 @@ import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.UiThread
 import com.example.monstarlabsexercise2.databinding.ActivityMainBinding
+import org.w3c.dom.Text
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,8 +41,18 @@ class MainActivity : AppCompatActivity() {
             if (event.action == MotionEvent.ACTION_MOVE) {
                 var y = event.y
                 when {
-                    y < rowY -> number += 1
-                    y > rowY -> number -= 1
+                    y < rowY -> {
+                        number += 1
+                        if (number % 100 == 0) {
+                            _binding.tvNumberShow.setColorRandom()
+                        }
+                    }
+                    y > rowY -> {
+                        number -= 1
+                        if (number % 100 == 0) {
+                            _binding.tvNumberShow.setColorRandom()
+                        }
+                    }
                 }
                 _binding.tvNumberShow.text = number.toString()
             }
@@ -79,6 +93,10 @@ class MainActivity : AppCompatActivity() {
                     number--
                     this.runOnUiThread {
                         _binding.tvNumberShow.text = number.toString()
+                        when {
+                            number == 100 -> _binding.tvNumberShow.setColorGray()
+                            number % 100 == 0 -> _binding.tvNumberShow.setColorRandom()
+                        }
                     }
                     handler.postDelayed(runnableBackZero, 50)
                 }
@@ -87,11 +105,19 @@ class MainActivity : AppCompatActivity() {
                     number++
                     this.runOnUiThread {
                         _binding.tvNumberShow.text = number.toString()
+                        when {
+                            number == -100 -> _binding.tvNumberShow.setColorGray()
+                            number % 100 == 0 -> _binding.tvNumberShow.setColorRandom()
+                        }
                     }
                     handler.postDelayed(runnableBackZero, 50)
                 }
                 else -> {
                     handler.removeCallbacks(runnableBackZero)
+                    this.runOnUiThread {
+                        var color = Color.rgb(128, 128, 128)
+                        _binding.tvNumberShow.setTextColor(color)
+                    }
                 }
             }
         }
@@ -102,6 +128,14 @@ class MainActivity : AppCompatActivity() {
                 handler.postDelayed(runnablePlus, 50)
                 this.runOnUiThread {
                     _binding.tvNumberShow.text = number.toString()
+                    when {
+                        number == 100 -> {
+                            _binding.tvNumberShow.setColorGray()
+                        }
+                        number % 100 == 0 -> {
+                            _binding.tvNumberShow.setColorRandom()
+                        }
+                    }
                 }
             } else {
                 handler.removeCallbacks(runnablePlus)
@@ -116,11 +150,31 @@ class MainActivity : AppCompatActivity() {
                 handler.postDelayed(runnableMinus, 50)
                 this.runOnUiThread {
                     _binding.tvNumberShow.text = number.toString()
+                    when {
+                        number == -100 -> {
+                            _binding.tvNumberShow.setColorGray()
+                        }
+                        number % 100 == 0 -> {
+                            _binding.tvNumberShow.setColorRandom()
+                        }
+                    }
                 }
             } else {
                 handler.removeCallbacks(runnableMinus)
                 handler.postDelayed(runnableBackZero, 2000)
             }
         }
+    }
+
+    private fun TextView.setColorRandom() {
+        var random = Random()
+        var colorRandom =
+            Color.argb(255, random.nextInt(265), random.nextInt(265), random.nextInt(265))
+        this.setTextColor(colorRandom)
+    }
+
+    private fun TextView.setColorGray() {
+        var color = Color.rgb(128, 128, 128)
+        this.setTextColor(color)
     }
 }
