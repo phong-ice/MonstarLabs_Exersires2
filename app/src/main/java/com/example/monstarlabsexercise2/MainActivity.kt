@@ -42,22 +42,23 @@ class MainActivity : AppCompatActivity() {
                 var y = event.y
                 when {
                     y < rowY -> {
-                        number += 1
-                        if (number % 100 == 0) {
+                        number++
+                        if (number % 100 == 0 && number != 0) {
                             _binding.tvNumberShow.setColorRandom()
                         }
                     }
                     y > rowY -> {
-                        number -= 1
-                        if (number % 100 == 0) {
+                        number--
+                        if (number % 100 == 0 && number != 0) {
                             _binding.tvNumberShow.setColorRandom()
                         }
                     }
                 }
                 _binding.tvNumberShow.text = number.toString()
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                handler.postDelayed(runnableBackZero, 2000)
             }
             rowY = event.y
-            handler.postDelayed(runnableBackZero, 2000)
 
             true
         }
@@ -95,7 +96,7 @@ class MainActivity : AppCompatActivity() {
                         _binding.tvNumberShow.text = number.toString()
                         when {
                             number == 100 -> _binding.tvNumberShow.setColorGray()
-                            number % 100 == 0 -> _binding.tvNumberShow.setColorRandom()
+                            number % 100 == 0 && number != 0 -> _binding.tvNumberShow.setColorRandom()
                         }
                     }
                     handler.postDelayed(runnableBackZero, 50)
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                         _binding.tvNumberShow.text = number.toString()
                         when {
                             number == -100 -> _binding.tvNumberShow.setColorGray()
-                            number % 100 == 0 -> _binding.tvNumberShow.setColorRandom()
+                            number % 100 == 0 && number != 0 -> _binding.tvNumberShow.setColorRandom()
                         }
                     }
                     handler.postDelayed(runnableBackZero, 50)
@@ -129,10 +130,10 @@ class MainActivity : AppCompatActivity() {
                 this.runOnUiThread {
                     _binding.tvNumberShow.text = number.toString()
                     when {
-                        number == 100 -> {
+                        number < 100 -> {
                             _binding.tvNumberShow.setColorGray()
                         }
-                        number % 100 == 0 -> {
+                        number % 100 == 0 && number != 0 -> {
                             _binding.tvNumberShow.setColorRandom()
                         }
                     }
@@ -151,10 +152,10 @@ class MainActivity : AppCompatActivity() {
                 this.runOnUiThread {
                     _binding.tvNumberShow.text = number.toString()
                     when {
-                        number == -100 -> {
+                        number > -100 -> {
                             _binding.tvNumberShow.setColorGray()
                         }
-                        number % 100 == 0 -> {
+                        number % 100 == 0 && number != 0 -> {
                             _binding.tvNumberShow.setColorRandom()
                         }
                     }
